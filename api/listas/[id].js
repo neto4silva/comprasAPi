@@ -5,7 +5,7 @@ const dataPath = path.resolve('./data.json');
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -35,6 +35,16 @@ export default function handler(req, res) {
       data.splice(index, 1);
       fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
       res.status(204).end();
+    } else {
+      res.status(404).json({ error: 'Lista não encontrada' });
+    }
+  } else if (method === 'POST') {
+    const index = data.findIndex(l => l.id === id);
+    if (index !== -1) {
+      const newItem = req.body;
+      data[index].shoppingList.push(newItem);
+      fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+      res.status(201).json(newItem);
     } else {
       res.status(404).json({ error: 'Lista não encontrada' });
     }
